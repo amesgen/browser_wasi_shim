@@ -1,8 +1,7 @@
 import WASI from "./wasi.js";
 export { WASI };
 
-export { Fd } from "./fd.js";
-export { Inode } from "./inode.js";
+export { Fd, Inode } from "./fd.js";
 export {
   File,
   SyncOPFSFile,
