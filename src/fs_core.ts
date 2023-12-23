@@ -16,7 +16,7 @@ export class OpenFile extends Fd {
       // already big enough
     } else {
       // extend
-      let new_data = new Uint8Array(Number(offset + len));
+      const new_data = new Uint8Array(Number(offset + len));
       new_data.set(this.file.data, 0);
       this.file.data = new_data;
     }
@@ -35,7 +35,7 @@ export class OpenFile extends Fd {
       );
     } else {
       // extend
-      let new_data = new Uint8Array(Number(size));
+      const new_data = new Uint8Array(Number(size));
       new_data.set(this.file.data, 0);
       this.file.data = new_data;
     }
@@ -198,6 +198,7 @@ export class OpenSyncOPFSFile extends Fd {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fd_filestat_set_size(size: bigint): number {
     this.file.handle.truncate(0);
     return wasi.ERRNO_SUCCESS;
@@ -280,6 +281,7 @@ export class OpenDirectory extends Fd {
     this.dir = dir;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fd_seek(offset: bigint, whence: number): { ret: number; offset: bigint } {
     return { ret: wasi.ERRNO_BADF, offset: 0n };
   }
@@ -288,6 +290,7 @@ export class OpenDirectory extends Fd {
     return { ret: wasi.ERRNO_BADF, offset: 0n };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fd_allocate(offset: bigint, len: bigint): number {
     return wasi.ERRNO_BADF;
   }
@@ -350,14 +353,15 @@ export class OpenDirectory extends Fd {
 
   path_lookup(
     path_str: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dirflags: number,
   ): { ret: number; inode_obj: Inode | null } {
-    let { ret: path_ret, path } = Path.from(path_str);
+    const { ret: path_ret, path } = Path.from(path_str);
     if (path == null) {
       return { ret: path_ret, inode_obj: null };
     }
 
-    let { ret, entry } = this.dir.get_entry_for_path(path);
+    const { ret, entry } = this.dir.get_entry_for_path(path);
     if (entry == null) {
       return { ret, inode_obj: null };
     }
@@ -366,18 +370,21 @@ export class OpenDirectory extends Fd {
   }
 
   path_open(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dirflags: number,
     path_str: string,
     oflags: number,
     fs_rights_base: bigint,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fs_rights_inheriting: bigint,
     fd_flags: number,
   ): { ret: number; fd_obj: Fd | null } {
-    let { ret: path_ret, path } = Path.from(path_str);
+    const { ret: path_ret, path } = Path.from(path_str);
     if (path == null) {
       return { ret: path_ret, fd_obj: null };
     }
 
+    // eslint-disable-next-line prefer-const
     let { ret, entry } = this.dir.get_entry_for_path(path);
     if (entry == null) {
       if (ret != wasi.ERRNO_NOENT) {
@@ -385,7 +392,7 @@ export class OpenDirectory extends Fd {
       }
       if ((oflags & wasi.OFLAGS_CREAT) == wasi.OFLAGS_CREAT) {
         // doesn't exist, but shall be created
-        let { ret, entry: new_entry } = this.dir.create_entry_for_path(
+        const { ret, entry: new_entry } = this.dir.create_entry_for_path(
           path_str,
           (oflags & wasi.OFLAGS_DIRECTORY) == wasi.OFLAGS_DIRECTORY,
         );
@@ -423,7 +430,7 @@ export class OpenDirectory extends Fd {
   }
 
   path_link(path_str: string, inode: Inode): number {
-    let { ret: path_ret, path } = Path.from(path_str);
+    const { ret: path_ret, path } = Path.from(path_str);
     if (path_str == null) {
       return path_ret;
     }
@@ -456,7 +463,7 @@ export class OpenDirectory extends Fd {
   }
 
   path_unlink_file(path_str: string): number {
-    let { ret: path_ret, path } = Path.from(path_str);
+    const { ret: path_ret, path } = Path.from(path_str);
     if (path == null) {
       return path_ret;
     }
@@ -478,7 +485,7 @@ export class OpenDirectory extends Fd {
   }
 
   path_remove_directory(path_str: string): number {
-    let { ret: path_ret, path } = Path.from(path_str);
+    const { ret: path_ret, path } = Path.from(path_str);
     if (path == null) {
       return path_ret;
     }
@@ -512,35 +519,46 @@ export class OpenDirectory extends Fd {
     return { ret: 0, filestat: this.dir.stat() };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fd_filestat_set_size(size: bigint): number {
     return wasi.ERRNO_BADF;
   }
 
   fd_read(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     view8: Uint8Array,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     iovs: wasi.Iovec[],
   ): { ret: number; nread: number } {
     return { ret: wasi.ERRNO_BADF, nread: 0 };
   }
 
   fd_pread(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     view8: Uint8Array,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     iovs: wasi.Iovec[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     offset: bigint,
   ): { ret: number; nread: number } {
     return { ret: wasi.ERRNO_BADF, nread: 0 };
   }
 
   fd_write(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     view8: Uint8Array,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     iovs: wasi.Ciovec[],
   ): { ret: number; nwritten: number } {
     return { ret: wasi.ERRNO_BADF, nwritten: 0 };
   }
 
   fd_pwrite(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     view8: Uint8Array,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     iovs: wasi.Ciovec[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     offset: bigint,
   ): { ret: number; nwritten: number } {
     return { ret: wasi.ERRNO_BADF, nwritten: 0 };
@@ -678,7 +696,7 @@ class Path {
   is_dir: boolean = false;
 
   static from(path: string): { ret: number; path: Path | null } {
-    let self = new Path();
+    const self = new Path();
     self.is_dir = path.endsWith("/");
 
     if (path.startsWith("/")) {
@@ -767,7 +785,7 @@ export class Directory extends Inode {
     filename: string | null;
     entry: Inode | null;
   } {
-    let filename = path.parts.pop();
+    const filename = path.parts.pop();
 
     if (filename === undefined) {
       return {
@@ -796,7 +814,7 @@ export class Directory extends Inode {
         entry: null,
       };
     }
-    let entry: Inode | undefined | null = parent_entry.contents.get(filename);
+    const entry: Inode | undefined | null = parent_entry.contents.get(filename);
     if (entry === undefined) {
       if (!allow_undefined) {
         return {
@@ -828,14 +846,17 @@ export class Directory extends Inode {
     path_str: string,
     is_dir: boolean,
   ): { ret: number; entry: Inode | null } {
-    let { ret: path_ret, path } = Path.from(path_str);
+    const { ret: path_ret, path } = Path.from(path_str);
     if (path == null) {
       return { ret: path_ret, entry: null };
     }
 
     let {
+      // eslint-disable-next-line prefer-const
       ret: parent_ret,
+      // eslint-disable-next-line prefer-const
       parent_entry,
+      // eslint-disable-next-line prefer-const
       filename,
       entry,
     } = this.get_parent_dir_and_entry_for_path(path, true);
