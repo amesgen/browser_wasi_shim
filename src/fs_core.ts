@@ -580,13 +580,18 @@ class Path {
     if (path.startsWith("/")) {
       return { ret: wasi.ERRNO_NOTCAPABLE, path: null };
     }
+    if (path.includes("\0")) {
+      return { ret: wasi.ERRNO_INVAL, path: null };
+    }
 
     for (const component of path.split("/")) {
       if (component === "" || component === ".") {
         continue;
       }
       if (component === "..") {
-        self.parts.pop();
+        if (self.parts.pop() == undefined) {
+          return { ret: wasi.ERRNO_NOTCAPABLE, path: null };
+        }
         continue;
       }
       self.parts.push(component);
@@ -639,6 +644,13 @@ export class Directory extends Inode {
         return { ret: wasi.ERRNO_NOENT, entry: null };
       }
     }
+
+    if (path.is_dir) {
+      if (entry.stat().filetype != wasi.FILETYPE_DIRECTORY) {
+        return { ret: wasi.ERRNO_NOTDIR, entry: null };
+      }
+    }
+
     return { ret: wasi.ERRNO_SUCCESS, entry };
   }
 
@@ -652,7 +664,6 @@ export class Directory extends Inode {
     entry: Inode | null;
   } {
     let filename = path.parts.pop();
-    path.is_dir = true;
 
     if (filename === undefined) {
       return {
@@ -694,6 +705,18 @@ export class Directory extends Inode {
         return { ret: wasi.ERRNO_SUCCESS, parent_entry, filename, entry: null };
       }
     }
+
+    if (path.is_dir) {
+      if (entry.stat().filetype != wasi.FILETYPE_DIRECTORY) {
+        return {
+          ret: wasi.ERRNO_NOTDIR,
+          parent_entry: null,
+          filename: null,
+          entry: null,
+        };
+      }
+    }
+
     return { ret: wasi.ERRNO_SUCCESS, parent_entry, filename, entry };
   }
 
